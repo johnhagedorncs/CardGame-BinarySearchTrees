@@ -3,6 +3,8 @@
 // Implementation of the classes defined in cards.h
 
 #include "cards.h"
+#include <iostream>
+#include <vector>
 using namespace std;
 
 Card::Card(string suit, string value){
@@ -157,6 +159,10 @@ bool BinarySearchTree::find(Node* node, const Card& card) const {
     }
 }
 
+bool BinarySearchTree::isEmpty() const {
+    return (root == nullptr);
+}
+
 BinarySearchTree::Node* BinarySearchTree::predecessorNode(const Card& card) const{
     Node* predecessorNode = nullptr;
     Node* current = root;
@@ -222,3 +228,86 @@ Card BinarySearchTree::successor(const Card& card) const {
     }
 }
 
+void BinarySearchTree::printInOrder() const {
+    printInOrder(root, "");
+}
+
+void BinarySearchTree::printInOrder(Node* n) const {
+    if (n != nullptr) {
+        printInOrder(n->left);
+        cout << n->data.get_suit() << " " << n->data.get_value() << endl;
+        printInOrder(n->right);
+    }
+}
+
+void BinarySearchTree::printInOrder(const string& player) const {
+    printInOrder(root, player);
+}
+
+void BinarySearchTree::printInOrder(Node* n, const string& player) const {
+    if (n != nullptr) {
+        printInOrder(n->left, player);
+
+        if (!player.empty()) {
+            cout << player << "'s picked matching card " << n->data.get_suit() << " " << n->data.get_value() << endl;
+        }
+
+        printInOrder(n->right, player);
+    }
+}
+
+string BinarySearchTree::valToString(int value) {
+    if (value >= 2 && value <= 10) {
+        return to_string(value);
+    } else {
+        switch (value) {
+            case 1: return "Ace";
+            case 11: return "Jack";
+            case 12: return "Queen";
+            case 13: return "King";
+            default: return "Unknown";
+        }
+    }
+}
+    
+string BinarySearchTree::suitToString(int suit) {
+    switch (suit) {
+        case 0: return "Clubs";
+        case 1: return "Diamonds";
+        case 2: return "Spades";
+        case 3: return "Hearts";
+        default: return "Unknown";
+    }
+}
+
+BinarySearchTree::Node* BinarySearchTree::getMin() const {
+    Node* current = root;
+    while (current != nullptr && current->left != nullptr) {
+        current = current->left;
+    }
+    return current;
+}
+
+BinarySearchTree::Node* BinarySearchTree::getMax() const {
+    Node* current = root;
+    while (current != nullptr && current->right != nullptr) {
+        current = current->right;
+    }
+    return current;
+}
+
+bool BinarySearchTree::has(int suit, int value) {
+    return find(Card(suitToString(suit), valToString(value)));
+}
+
+void BinarySearchTree::remove(int suit, int value) {
+    remove(root, Card(suitToString(suit), valToString(value)));
+}
+
+BinarySearchTree::Node* BinarySearchTree::successor(int suit, int value) {
+    return successorNode(Card(suitToString(suit), valToString(value)));
+}
+
+BinarySearchTree::Node* BinarySearchTree::predecessor(int suit, int value) {
+    return predecessorNode(Card(suitToString(suit), valToString(value)));
+}
