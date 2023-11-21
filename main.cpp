@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "utility.h"
 #include "cards.h"
 
 using namespace std;
