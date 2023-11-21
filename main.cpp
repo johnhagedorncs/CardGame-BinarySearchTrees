@@ -96,9 +96,7 @@ int main(int argv, char** argc){
         a1 = firstSet(firstStr);
         a2 = secondSet(secondStr);
 
-        BinarySearchTree bst;
-
-        Card newCard = Card(bst.suitToString(a1), bst.valToString(a2));
+        Card newCard = Card(CardUtility::suitToString(a1), CardUtility::valToString(a2));
         Alice.insert(newCard);
     }
     cardFile1.close();
@@ -118,9 +116,7 @@ int main(int argv, char** argc){
         b1 = firstSet(firstStr);
         b2 = secondSet(secondStr);
 
-        BinarySearchTree bst;
-
-        Card newCard = Card(bst.suitToString(b1), bst.valToString(b2));
+        Card newCard = Card(CardUtility::suitToString(b1), CardUtility::valToString(b2));  // Use CardUtility functions instead
         Bob.insert(newCard);
     }
     cardFile2.close();
@@ -187,4 +183,5 @@ int main(int argv, char** argc){
     }
 
     BobNode = Bob.getMax();  // Reset BobNode for the next iteration
+}
 }

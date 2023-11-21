@@ -3,6 +3,7 @@
 // Implementation of the classes defined in cards.h
 
 #include "cards.h"
+#include "utility.h"
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -12,6 +13,11 @@ Card::Card(string suit, string value){
     cardValue = value;
 }
 
+Card::Card(int suit, int value) {
+    cardSuit = CardUtility::suitToString(suit);
+    cardValue = CardUtility::valToString(value);
+}
+
 string Card::get_value() const {
     return cardValue;
 }
@@ -19,7 +25,6 @@ string Card::get_value() const {
 string Card::get_suit() const {
     return cardSuit;
 }
-
 
 bool Card::operator==(const Card& other) const {
     return (cardValue == other.cardValue) && (cardSuit == other.cardSuit);
