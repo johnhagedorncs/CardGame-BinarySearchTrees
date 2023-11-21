@@ -54,6 +54,44 @@ void CardBST::removeNode(int val1, int val2) {
     root = remove(val1, val2, root);
 }
 
+// Recursive helper function to remove a card from the BST
+Node* CardBST::remove(int val1, int val2, Node* n) {
+    if (n == nullptr) {
+        return nullptr;
+    }
+
+    Card currentCard(n->suit, n->value);
+    Card targetCard(val1, val2);
+
+    if (currentCard < targetCard) {
+        n->right = remove(val1, val2, n->right);
+    } else if (currentCard > targetCard) {
+        n->left = remove(val1, val2, n->left);
+    } else {
+        // Node with only one child or no child
+        if (n->left == nullptr) {
+            Node* temp = n->right;
+            delete n;
+            return temp;
+        } else if (n->right == nullptr) {
+            Node* temp = n->left;
+            delete n;
+            return temp;
+        }
+
+        // Node with two children, get the inorder successor
+        Node* successor = min(n->right);
+
+        // Copy the inorder successor's data to this node
+        n->suit = successor->suit;
+        n->value = successor->value;
+
+        // Delete the inorder successor
+        n->right = remove(successor->suit, successor->value, n->right);
+    }
+    return n;
+}
+
 // Function to check if a card is present in the BST
 bool CardBST::has(int val1, int val2) {
     return nodeFinder(val1, val2, root);
@@ -75,15 +113,21 @@ Node* CardBST::successor(int val1, int val2, Node* n) {
         return nullptr;
     }
 
-    Card currentCard(n->suit, n->value);
     Card targetCard(val1, val2);
 
-    if (currentCard <= targetCard) {
-        return successor(val1, val2, n->right);
-    } else {
-        Node* successorNode = successor(val1, val2, n->left);
-        return (successorNode != nullptr) ? successorNode : n;
+    Node* successorNode = nullptr;
+    while (n != nullptr) {
+        Card currentCard(n->suit, n->value);
+
+        if (currentCard <= targetCard) {
+            n = n->right;
+        } else {
+            successorNode = n;
+            n = n->left;
+        }
     }
+
+    return successorNode;
 }
 
 // Recursive helper function to find the predecessor of a card in the BST
@@ -156,45 +200,6 @@ void CardBST::printInOrder(Node* n) {
     }
 }
 
-// Recursive helper function to remove a card from the BST
-Node* CardBST::remove(int val1, int val2, Node* n) {
-    if (n == nullptr) {
-        return nullptr;
-    }
-
-    Card currentCard(n->suit, n->value);
-    Card targetCard(val1, val2);
-
-    if (currentCard < targetCard) {
-        n->right = remove(val1, val2, n->right);
-    } else if (currentCard > targetCard) {
-        n->left = remove(val1, val2, n->left);
-    } else {
-        if (n->left == nullptr && n->right == nullptr) {
-            // Case 1: No child
-            delete n;
-            return nullptr;
-        } else if (n->left == nullptr) {
-            // Case 2: One child (right)
-            Node* temp = n->right;
-            delete n;
-            return temp;
-        } else if (n->right == nullptr) {
-            // Case 2: One child (left)
-            Node* temp = n->left;
-            delete n;
-            return temp;
-        } else {
-            // Case 3: Two children
-            Node* successor = min(n->right);
-            n->suit = successor->suit;
-            n->value = successor->value;
-            n->right = remove(successor->suit, successor->value, n->right);
-        }
-    }
-    return n;
-}
-
 // Recursive helper function to find the minimum value node in the BST
 Node* CardBST::min(Node* n) {
     while (n->left != nullptr) {
@@ -215,6 +220,7 @@ bool CardBST::insert(int val1, int val2) {
     return insert(val1, val2, root);
 }
 
+// Recursive helper function to insert a card into the BST
 bool CardBST::insert(int val1, int val2, Node*& n) {
     if (n == nullptr) {
         n = new Node(val1, val2);
@@ -225,9 +231,21 @@ bool CardBST::insert(int val1, int val2, Node*& n) {
     Card targetCard(val1, val2);
 
     if (currentCard < targetCard) {
-        return insert(val1, val2, n->right);
+        if (n->right == nullptr) {
+            n->right = new Node(val1, val2);
+            n->right->parent = n;  // Update the parent pointer
+            return true;
+        } else {
+            return insert(val1, val2, n->right);
+        }
     } else if (currentCard > targetCard) {
-        return insert(val1, val2, n->left);
+        if (n->left == nullptr) {
+            n->left = new Node(val1, val2);
+            n->left->parent = n;  // Update the parent pointer
+            return true;
+        } else {
+            return insert(val1, val2, n->left);
+        }
     } else {
         // Duplicate card found
         return false;
