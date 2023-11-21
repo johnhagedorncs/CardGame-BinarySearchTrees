@@ -1,3 +1,6 @@
+// main.cpp
+// Author: John Hagedorn
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -35,6 +38,32 @@ int secondSet(string s2) {
     return a;
 }
 
+string vToString(int valueNum) {
+    if (valueNum == 1) {
+        return "a";
+    } else if (valueNum = 11) {
+        return "j";
+    } else if (valueNum == 12) {
+        return "q";
+    } else if (valueNum == 13) {
+        return "k";
+    } else {
+        return to_string(valueNum);
+    }
+}
+
+string sToString(int suitValue) {
+    if (suitValue == 1) {
+        return "c";
+    } else if (suitValue == 2) {
+        return "d";
+    } else if (suitValue == 3) {
+        return "s";
+    } else {
+        return "h";
+    }
+}
+
 int main(int argc, char** argv) {
     if (argc < 3) {
         cout << "Please provide 2 file names" << endl;
@@ -50,48 +79,44 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    BinarySearchTree Alice;
-    BinarySearchTree Bob;
+    CardBST Alice;
+    CardBST Bob;
 
     // Read each file
     while (getline(cardFile1, line) && (line.length() > 0)) {
         int a1;
         int a2;
-        string firstStr = line.substr(0, 1);
-        string secondStr;
+        string strng1 = line.substr(0, 1);
+        string strng2;
         if (line.length() == 4) {
-            secondStr = line.substr(2, 2);
+            strng2 = line.substr(2, 2);
         } else {
-            secondStr = line.substr(2, 1);
+            strng2 = line.substr(2, 1);
         }
-        a1 = firstSet(firstStr);
-        a2 = secondSet(secondStr);
-
-        Card newCard = Card(CardUtility::suitToString(a1), CardUtility::valToString(a2));
-        Alice.insert(newCard);
+        a1 = firstSet(strng1);
+        a2 = secondSet(strng2);
+        Alice.insert(a1, a2);
     }
     cardFile1.close();
 
     while (getline(cardFile2, line) && (line.length() > 0)) {
         int b1;
         int b2;
-        string firstStr = line.substr(0, 1);
-        string secondStr;
+        string strng1 = line.substr(0, 1);
+        string strng2;
         if (line.length() == 4) {
-            secondStr = line.substr(2, 2);
+            strng2 = line.substr(2, 2);
         } else {
-            secondStr = line.substr(2, 1);
+            strng2 = line.substr(2, 1);
         }
-        b1 = firstSet(firstStr);
-        b2 = secondSet(secondStr);
-
-        Card newCard = Card(CardUtility::suitToString(b1), CardUtility::valToString(b2));
-        Bob.insert(newCard);
+        b1 = firstSet(strng1);
+        b2 = secondSet(strng2);
+        Bob.insert(b1, b2);
     }
     cardFile2.close();
 
-    BinarySearchTree::Node* AliceNode = Alice.getMin();
-    BinarySearchTree::Node* BobNode = Bob.getMax();
+    Node* AliceNode = Alice.getMin();
+    Node* BobNode = Bob.getMax();
 
     while (true) {
         bool found = false;
@@ -100,24 +125,19 @@ int main(int argc, char** argv) {
             break;
         }
 
+        // Alice's turn
         while (AliceNode) {
-            int aliceSuit = Alice.suitToInteger(AliceNode->data.get_suit());
-            int aliceValue = Alice.valueToInteger(AliceNode->data.get_value());
-
-            if (Bob.has(aliceSuit, aliceValue)) {
+            if (Bob.has(AliceNode->suit, AliceNode->value) == true) {
                 found = true;
-
-                Card cardToRemove(aliceSuit, aliceValue);
-                Alice.remove(cardToRemove);
-                Bob.remove(cardToRemove);
-
-                cout << "Matching card found: " << AliceNode->data.get_suit() << " " << AliceNode->data.get_value() << endl;
-
-                AliceNode = Alice.successor(aliceSuit, aliceValue);
-
+                int suit = AliceNode->suit;
+                int value = AliceNode->value;
+                Alice.removeNode(suit, value);
+                Bob.removeNode(suit, value);
+                cout << "Alice picked matching card " << sToString(suit) << " " << vToString(value) << endl;
+                AliceNode = Alice.successor(suit, value);
                 break;
             } else {
-                AliceNode = Alice.successor(aliceSuit, aliceValue);
+                AliceNode = Alice.successor(AliceNode->suit, AliceNode->value);
             }
         }
 
@@ -125,28 +145,26 @@ int main(int argc, char** argv) {
 
         // Bob's turn
         while (BobNode) {
-            int bobSuit = Bob.suitToInteger(BobNode->data.get_suit());
-            int bobValue = Bob.valueToInteger(BobNode->data.get_value());
-
-            if (Alice.has(bobSuit, bobValue)) {
+            if (Alice.has(BobNode->suit, BobNode->value) == true) {
                 found = true;
-
-                Card cardToRemove(bobSuit, bobValue);
-                Alice.remove(cardToRemove);
-                Bob.remove(cardToRemove);
-
-                cout << "Matching card found: " << BobNode->data.get_suit() << " " << BobNode->data.get_value() << endl;
-
-                BobNode = Bob.predecessor(bobSuit, bobValue);
-
+                int suit = BobNode->suit;
+                int value = BobNode->value;
+                Alice.removeNode(suit, value);
+                Bob.removeNode(suit, value);
+                cout << "Bob picked matching card " << sToString(suit) << " " << vToString(value) << endl;
+                BobNode = Bob.predecessor(suit, value);
                 break;
             } else {
-                BobNode = Bob.predecessor(bobSuit, bobValue);
+                BobNode = Bob.predecessor(BobNode->suit, BobNode->value);
             }
         }
 
-        BobNode = Bob.getMax();  // Reset BobNode for the next iteration
+        BobNode = Bob.getMax();
     }
 
-    return 0;
+    cout << "Alice's cards:" << endl;
+    Alice.printInOrder();
+
+    cout << "Bob's cards:" << endl;
+    Bob.printInOrder();
 }

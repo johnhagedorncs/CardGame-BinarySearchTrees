@@ -1,318 +1,253 @@
 // cards.cpp
 // Author: John Hagedorn
-// Implementation of the classes defined in cards.h
+// Implementation of the CardBST class
 
 #include "cards.h"
-#include "utility.h"
 #include <iostream>
-#include <vector>
+
 using namespace std;
 
-Card::Card(string suit, string value){
-    cardSuit = suit;
-    cardValue = value;
-}
+// Constructor
+CardBST::CardBST() : root(nullptr) {}
 
-Card::Card(int suit, int value) {
-    cardSuit = CardUtility::suitToString(suit);
-    cardValue = CardUtility::valToString(value);
-}
-
-string Card::get_value() const {
-    return cardValue;
-}
-
-string Card::get_suit() const {
-    return cardSuit;
-}
-
-bool Card::operator==(const Card& other) const {
-    return (cardValue == other.cardValue) && (cardSuit == other.cardSuit);
-    // overloads the == operator to check if card val AND suit are equal to 'other'
-}
-
-bool Card::operator>(const Card& other) const {
-    if (cardSuit != other.cardSuit) {
-        if (cardSuit == "Clubs") {               // lowest suit
-            return false;                        // other.card wins
-        } else if (other.cardSuit == "Clubs") {
-            return true;                         // card wins
-        } else if (cardSuit == "Diamonds") {
-            return false; 
-        } else if (other.cardSuit == "Diamonds") {
-            return true; 
-        } else if (cardSuit == "Spades") {
-            return false; 
-        } else if (other.cardSuit == "Spades") {
-            return true;
-        } else {                                   // hearts
-            return false; // Other card has a greater suit
-        }
-    } else {
-        // If suits are same, compare based on value
-        return (cardValue > other.cardValue);
-    }
-}
-
-bool Card::operator<(const Card& other) const {
-    if (cardSuit != other.cardSuit) {
-        if (cardSuit == "Clubs") {               // lowest suit
-            return true;                         // card wins
-        } else if (other.cardSuit == "Clubs") {
-            return false;                        // other.card wins
-        } else if (cardSuit == "Diamonds") {
-            return true; 
-        } else if (other.cardSuit == "Diamonds") {
-            return false; 
-        } else if (cardSuit == "Spades") {
-            return true; 
-        } else if (other.cardSuit == "Spades") {
-            return false;
-        } else {                                   // hearts
-            return true; // Card has a greater suit
-        }
-    } else {
-        // If suits are the same, compare based on value
-        return (cardValue < other.cardValue);
-    }
-}
-
-
-
-BinarySearchTree::BinarySearchTree() {      //constructor
-    root = nullptr;
-}
-
-BinarySearchTree::~BinarySearchTree() {     //destructor
+// Destructor
+CardBST::~CardBST() {
     clear(root);
 }
 
-void BinarySearchTree::clear(Node *n) {
-    if (n == nullptr) {
-        return;
-    } else {
+// Function to print the cards in order
+void CardBST::printInOrder() {
+    printInOrder(root);
+}
+
+// Function to clear the tree
+void CardBST::clear(Node* n) {
+    if (n != nullptr) {
         clear(n->left);
         clear(n->right);
         delete n;
     }
 }
 
-void BinarySearchTree::insert(const Card& card) {
-    insert(root, card);
-}
-
-void BinarySearchTree::insert(Node*& node, const Card& card) {  // insert helper function
-    if (node == nullptr) {
-        node = new Node(card);
-        return;
-    } else if (card < node->data) {
-        insert(node->left, card);
+// Function to print the predecessor of a card in the BST
+void CardBST::printPredecessor(int val1, int val2) {
+    Node* predecessor = this->predecessor(val1, val2);
+    if (predecessor != nullptr) {
+        cout << "Predecessor: " << suitToString(predecessor->suit) << " " << valToString(predecessor->value) << endl;
     } else {
-        insert(node->right, card);
+        cout << "No predecessor found." << endl;
     }
 }
 
-void BinarySearchTree::remove(const Card& card) {
-    remove(root, card);
-}
-
-void BinarySearchTree::remove(Node*& node, const Card& card) {  //remove helper function
-    if (node == NULL) {
-        return;
-    }
-    if (card < node->data) {
-        remove(node->left, card);
-    } else if (card > node->data) {
-        remove(node->right, card);
+// Function to print the successor of a card in the BST
+void CardBST::printSuccessor(int val1, int val2) {
+    Node* successor = this->successor(val1, val2);
+    if (successor != nullptr) {
+        cout << "Successor: " << suitToString(successor->suit) << " " << valToString(successor->value) << endl;
     } else {
-        if (node->left == NULL && node->right == NULL) {     // Node has no children
-            delete node;
-            node = NULL;
-        } else if (node->left == NULL) {                     // Node has one right child
-            Node* temp = node;
-            node = node->right;
-            delete temp;
-        } else if (node->right == NULL) {                    // Node has one left child
-            Node* temp = node;
-            node = node->left;
-            delete temp;
-        } else {                                             // Node has two children
-            Node* successor = node->right;                   // Find the successor
-            while (successor->left != NULL) {
-                successor = successor->left;
-            }
-            node->data = successor->data;                    // Copy successor data to current node
-            remove(node->right, successor->data);            // remove successor from right subtree
-        }
+        cout << "No successor found." << endl;
     }
 }
 
-bool BinarySearchTree::find(const Card& card) const {
-    return find(root, card);
+// Function to remove a card from the BST
+void CardBST::removeNode(int val1, int val2) {
+    root = remove(val1, val2, root);
 }
 
-bool BinarySearchTree::find(Node* node, const Card& card) const {
-    if (node == NULL) {
-        return false;
+// Function to check if a card is present in the BST
+bool CardBST::has(int val1, int val2) {
+    return nodeFinder(val1, val2, root);
+}
+
+// Function to get the successor of a card in the BST
+Node* CardBST::successor(int val1, int val2) {
+    return successor(val1, val2, root);
+}
+
+// Function to get the predecessor of a card in the BST
+Node* CardBST::predecessor(int val1, int val2) {
+    return predecessor(val1, val2, root);
+}
+
+// Recursive helper function to find the successor of a card in the BST
+Node* CardBST::successor(int val1, int val2, Node* n) {
+    if (n == nullptr) {
+        return nullptr;
     }
-    if (card == node->data) {
-        return true;  
-    } else if (card < node->data) {
-        return find(node->left, card);
+
+    Card currentCard(n->suit, n->value);
+    Card targetCard(val1, val2);
+
+    if (currentCard <= targetCard) {
+        return successor(val1, val2, n->right);
     } else {
-        return find(node->right, card);
+        Node* successorNode = successor(val1, val2, n->left);
+        return (successorNode != nullptr) ? successorNode : n;
     }
 }
 
-bool BinarySearchTree::isEmpty() const {
-    return (root == nullptr);
-}
-
-BinarySearchTree::Node* BinarySearchTree::predecessorNode(const Card& card) const{
-    Node* predecessorNode = nullptr;
-    Node* current = root;
-    while (current != nullptr) {
-        if (card == current->data) {
-            if (current->left != nullptr) {
-                current = current->left;
-                while (current->right != nullptr) {
-                    current = current->right;
-                }
-                predecessorNode = current;
-            }
-            break;
-        } else if (card < current->data) {
-            current = current->left;
-        } else {
-            predecessorNode = current;
-            current = current->right;
-        }
+// Recursive helper function to find the predecessor of a card in the BST
+Node* CardBST::predecessor(int val1, int val2, Node* n) {
+    if (n == nullptr) {
+        return nullptr;
     }
-    return predecessorNode;
-}
 
-// returns the predecessor value of the given value or 0 if there is none
-Card BinarySearchTree::predecessor(const Card& card) const {
-    Node* preNode = predecessorNode(card);
-    if (preNode != nullptr) {
-        return preNode->data;
+    Card currentCard(n->suit, n->value);
+    Card targetCard(val1, val2);
+
+    if (currentCard >= targetCard) {
+        return predecessor(val1, val2, n->left);
     } else {
-        return Card("",  "");
+        Node* predecessorNode = predecessor(val1, val2, n->right);
+        return (predecessorNode != nullptr) ? predecessorNode : n;
     }
 }
 
-// returns the Node containing the successor of the given value
-BinarySearchTree::Node* BinarySearchTree::successorNode(const Card& card) const{
-    Node* curr = root;
-    Node* successor = nullptr;
-    while (curr != nullptr) {
-        if (card < curr->data) {
-            successor = curr;
-            curr = curr->left;
-        } else if (card > curr->data) {
-            curr = curr->right;
-        } else {
-            if (curr->right != nullptr) {
-                successor = curr->right;
-                while (successor->left != nullptr) {
-                    successor = successor->left;
-                }
-            }
-            break;
-        }
+// Function to get a specific node in the BST
+Node* CardBST::getNode(int val1, int val2, Node* n) {
+    if (n == nullptr) {
+        return nullptr;
     }
-    return successor;
-}
-// returns the successor value of the given value or 0 if there is none
-Card BinarySearchTree::successor(const Card& card) const {
-    Node* successNode = successorNode(card);
-    if (successNode != nullptr) {
-        return successNode->data;
+
+    Card currentCard(n->suit, n->value);
+    Card targetCard(val1, val2);
+
+    if (currentCard == targetCard) {
+        return n;
+    } else if (currentCard < targetCard) {
+        return getNode(val1, val2, n->right);
     } else {
-        return Card("",  "");
+        return getNode(val1, val2, n->left);
     }
 }
 
-void BinarySearchTree::printInOrder() const {
-    printInOrder(root, "");
-}
-
-void BinarySearchTree::printInOrder(Node* n) const {
-    if (n != nullptr) {
-        printInOrder(n->left);
-        cout << n->data.get_suit() << " " << n->data.get_value() << endl;
-        printInOrder(n->right);
-    }
-}
-
-void BinarySearchTree::printInOrder(const string& player) const {
-    printInOrder(root, player);
-}
-
-void BinarySearchTree::printInOrder(Node* n, const string& player) const {
-    if (n != nullptr) {
-        printInOrder(n->left, player);
-
-        if (!player.empty()) {
-            cout << player << "'s picked matching card " << n->data.get_suit() << " " << n->data.get_value() << endl;
-        }
-
-        printInOrder(n->right, player);
-    }
-}
-
-string BinarySearchTree::valToString(int value) {
-    if (value >= 2 && value <= 10) {
-        return to_string(value);
-    } else {
-        switch (value) {
-            case 1: return "Ace";
-            case 11: return "Jack";
-            case 12: return "Queen";
-            case 13: return "King";
-            default: return "Unknown";
-        }
-    }
-}
-    
-string BinarySearchTree::suitToString(int suit) {
+// Utility function to convert suit to string
+string CardBST::suitToString(int suit) {
     switch (suit) {
-        case 0: return "Clubs";
-        case 1: return "Diamonds";
-        case 2: return "Spades";
-        case 3: return "Hearts";
+        case 1: return "c";
+        case 2: return "d";
+        case 3: return "s";
+        case 4: return "h";
         default: return "Unknown";
     }
 }
 
-BinarySearchTree::Node* BinarySearchTree::getMin() const {
-    Node* current = root;
-    while (current != nullptr && current->left != nullptr) {
-        current = current->left;
+// Utility function to convert value to string
+string CardBST::valToString(int value) {
+    if (value == 1) {
+        return "a";
+    } else if (value == 11) {
+        return "j";
+    } else if (value == 12) {
+        return "q";
+    } else if (value == 13) {
+        return "k";
+    } else {
+        return to_string(value);
     }
-    return current;
 }
 
-BinarySearchTree::Node* BinarySearchTree::getMax() const {
-    Node* current = root;
-    while (current != nullptr && current->right != nullptr) {
-        current = current->right;
+// Recursive helper function to print the cards in order
+void CardBST::printInOrder(Node* n) {
+    if (n != nullptr) {
+        printInOrder(n->left);
+        cout << suitToString(n->suit) << " " << valToString(n->value) << endl;
+        printInOrder(n->right);
     }
-    return current;
 }
 
-bool BinarySearchTree::has(int suit, int value) {
-    return find(Card(suitToString(suit), valToString(value)));
+// Recursive helper function to remove a card from the BST
+Node* CardBST::remove(int val1, int val2, Node* n) {
+    if (n == nullptr) {
+        return nullptr;
+    }
+
+    Card currentCard(n->suit, n->value);
+    Card targetCard(val1, val2);
+
+    if (currentCard < targetCard) {
+        n->right = remove(val1, val2, n->right);
+    } else if (currentCard > targetCard) {
+        n->left = remove(val1, val2, n->left);
+    } else {
+        if (n->left == nullptr && n->right == nullptr) {
+            // Case 1: No child
+            delete n;
+            return nullptr;
+        } else if (n->left == nullptr) {
+            // Case 2: One child (right)
+            Node* temp = n->right;
+            delete n;
+            return temp;
+        } else if (n->right == nullptr) {
+            // Case 2: One child (left)
+            Node* temp = n->left;
+            delete n;
+            return temp;
+        } else {
+            // Case 3: Two children
+            Node* successor = min(n->right);
+            n->suit = successor->suit;
+            n->value = successor->value;
+            n->right = remove(successor->suit, successor->value, n->right);
+        }
+    }
+    return n;
 }
 
-void BinarySearchTree::remove(int suit, int value) {
-    remove(root, Card(suitToString(suit), valToString(value)));
+// Recursive helper function to find the minimum value node in the BST
+Node* CardBST::min(Node* n) {
+    while (n->left != nullptr) {
+        n = n->left;
+    }
+    return n;
 }
 
-BinarySearchTree::Node* BinarySearchTree::successor(int suit, int value) {
-    return successorNode(Card(suitToString(suit), valToString(value)));
+// Recursive helper function to find the maximum value node in the BST
+Node* CardBST::max(Node* n) {
+    while (n->right != nullptr) {
+        n = n->right;
+    }
+    return n;
 }
 
-BinarySearchTree::Node* BinarySearchTree::predecessor(int suit, int value) {
-    return predecessorNode(Card(suitToString(suit), valToString(value)));
+bool CardBST::insert(int val1, int val2) {
+    return insert(val1, val2, root);
+}
+
+bool CardBST::insert(int val1, int val2, Node*& n) {
+    if (n == nullptr) {
+        n = new Node(val1, val2);
+        return true;
+    }
+
+    Card currentCard(n->suit, n->value);
+    Card targetCard(val1, val2);
+
+    if (currentCard < targetCard) {
+        return insert(val1, val2, n->right);
+    } else if (currentCard > targetCard) {
+        return insert(val1, val2, n->left);
+    } else {
+        // Duplicate card found
+        return false;
+    }
+}
+
+// Recursive helper function to check if a card is present in the BST
+bool CardBST::nodeFinder(int val1, int val2, Node* n) {
+    if (n == nullptr) {
+        return false;
+    }
+
+    Card currentCard(n->suit, n->value);
+    Card targetCard(val1, val2);
+
+    if (currentCard < targetCard) {
+        return nodeFinder(val1, val2, n->right);
+    } else if (currentCard > targetCard) {
+        return nodeFinder(val1, val2, n->left);
+    } else {
+        return true;
+    }
 }
