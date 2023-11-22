@@ -115,68 +115,107 @@ int main(int argc, char** argv) {
     Node* AliceNode = Alice.getMin();
     Node* BobNode = Bob.getMax();
 
+    list<Card> aliceMatches;
+    list<Card> bobMatches;
+
     while (true) {
-    bool aliceFound = false;
-    bool bobFound = false;
+        bool aliceFound = false;
+        bool bobFound = false;
 
-    if (AliceNode == nullptr || BobNode == nullptr) {
-        break;
-    }
-
-    // Alice's turn
-    while (AliceNode) {
-        if (Bob.has(AliceNode->suit, AliceNode->value)) {
-            aliceFound = true;
-            int suit = AliceNode->suit;
-            int value = AliceNode->value;
-            Alice.removeNode(suit, value);
-            Bob.removeNode(suit, value);
-            cout << "Alice picked matching card " << sToString(suit) << " " << vToString(value) << endl;
-
-            // Update Alice's node after removal
-            AliceNode = Alice.successor(suit, value);
-
+        if (AliceNode == nullptr || BobNode == nullptr) {
             break;
-        } else {
-            AliceNode = Alice.successor(AliceNode->suit, AliceNode->value);
+        }
+
+        // Alice's turn
+        while (AliceNode) {
+            if (Bob.has(AliceNode->suit, AliceNode->value)) {
+                aliceFound = true;
+                int suit = AliceNode->suit;
+                int value = AliceNode->value;
+                Alice.removeNode(suit, value);
+                Bob.removeNode(suit, value);
+                aliceMatches.push_back(Card(suit, value));  // Store matching card for Alice
+                cout << "Alice picked matching card " << sToString(suit) << " " << vToString(value) << endl;
+                AliceNode = Alice.successor(suit, value);
+                break;
+            } else {
+                AliceNode = Alice.successor(AliceNode->suit, AliceNode->value);
+            }
+        }
+
+        AliceNode = Alice.getMin();  // Reset AliceNode for the next iteration
+
+        // Bob's turn
+        while (BobNode) {
+            if (Alice.has(BobNode->suit, BobNode->value)) {
+                bobFound = true;
+                int suit = BobNode->suit;
+                int value = BobNode->value;
+                Alice.removeNode(suit, value);
+                Bob.removeNode(suit, value);
+                bobMatches.push_back(Card(suit, value));  // Store matching card for Bob
+                cout << "Bob picked matching card " << sToString(suit) << " " << vToString(value) << endl;
+                BobNode = Bob.predecessor(suit, value);
+                break;
+            } else {
+                BobNode = Bob.predecessor(BobNode->suit, BobNode->value);
+            }
+        }
+
+        BobNode = Bob.getMax();
+
+        // If no matching cards were found for both players, exit the loop
+        if (!aliceFound && !bobFound) {
+            break;
         }
     }
 
-    AliceNode = Alice.getMin();  // Reset AliceNode for the next iteration
-
-    // Bob's turn
-    while (BobNode) {
-        if (Alice.has(BobNode->suit, BobNode->value)) {
-            bobFound = true;
-            int suit = BobNode->suit;
-            int value = BobNode->value;
-            Alice.removeNode(suit, value);
-            Bob.removeNode(suit, value);
-            cout << "Bob picked matching card " << sToString(suit) << " " << vToString(value) << endl;
-
-            // Update Bob's node after removal
-            BobNode = Bob.predecessor(suit, value);
-
-            break;
-        } else {
-            BobNode = Bob.predecessor(BobNode->suit, BobNode->value);
-        }
+    // Print matching cards for Alice and Bob
+    for (const auto& card : aliceMatches) {
+        cout << "Alice picked matching card " << sToString(card.suit) << " " << vToString(card.value) << endl;
     }
 
-    BobNode = Bob.getMax();
+    for (const auto& card : bobMatches) {
+        cout << "Bob picked matching card " << sToString(card.suit) << " " << vToString(card.value) << endl;
+    }
 
-    // If no matching cards were found for both players, exit the loop
-    if (!aliceFound && !bobFound) {
-        break;
+    // Print remaining cards for Alice without duplicates
+    cout << "Alice's cards:" << endl;
+    list<Card> aliceRemaining;
+        for (const auto& card : aliceMatches) {
+            bool duplicate = false;
+            for (const auto& existingCard : aliceRemaining) {
+                if (existingCard == card) {
+                    duplicate = true;
+                    break;
+                }
+            }
+    if (!duplicate) {
+        aliceRemaining.push_back(card);
     }
 }
+    for (const auto& card : aliceRemaining) {
+        cout << sToString(card.suit) << " " << vToString(card.value) << endl;
+    }
 
-
-    cout << "Alice's cards:" << endl;
-    Alice.printInOrder();
-
+    // Print remaining cards for Bob without duplicates
     cout << "Bob's cards:" << endl;
-    Bob.printInOrder();
+    list<Card> bobRemaining;
+        for (const auto& card : bobMatches) {
+            bool duplicate = false;
+            for (const auto& existingCard : bobRemaining) {
+                if (existingCard == card) {
+                    duplicate = true;
+                    break;
+                }
+            }
+        if (!duplicate) {
+            bobRemaining.push_back(card);
+            }
+        }
+    for (const auto& card : bobRemaining) {
+        cout << sToString(card.suit) << " " << vToString(card.value) << endl;
+    }
 
     return 0;
 }
