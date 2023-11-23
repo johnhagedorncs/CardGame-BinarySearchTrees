@@ -1,3 +1,73 @@
+#include "cards.h"
+#include <fstream>
+#include <limits>
+
+// Implementation for Card class
+bool Card::operator==(const Card& other) const {
+    return (suit == other.suit) && (value == other.value);
+}
+
+bool Card::operator<(const Card& other) const {
+    if (suit != other.suit) {
+        return suit < other.suit;
+    }
+    return value < other.value;
+}
+
+std::ostream& operator<<(std::ostream& os, const Card& card) {
+    os << card.suit << " " << card.value;
+    return os;
+}
+
+// Implementation for BST class
+BST::Node::Node(const Card& card) : data(card), left(nullptr), right(nullptr) {}
+
+BST::BST() : root(nullptr) {}
+
+void BST::insert(const Card& card) {
+    root = insertHelper(root, card);
+}
+
+BST::Node* BST::insertHelper(Node* node, const Card& card) {
+    if (node == nullptr) {
+        return new Node(card);
+    }
+
+    if (card < node->data) {
+        node->left = insertHelper(node->left, card);
+    } else {
+        node->right = insertHelper(node->right, card);
+    }
+
+    return node;
+}
+
+std::vector<Card> BST::inOrderTraversal() const {
+    std::vector<Card> result;
+    inOrderTraversalHelper(root, result);
+    return result;
+}
+
+void BST::inOrderTraversalHelper(Node* node, std::vector<Card>& result) const {
+    if (node) {
+        inOrderTraversalHelper(node->left, result);
+        result.push_back(node->data);
+        inOrderTraversalHelper(node->right, result);
+    }
+}
+
+// Function to read cards from a file and insert them into a BST
+void readCards(std::ifstream& file, BST& tree) {
+    char suit;
+    std::string value;
+
+    while (file.get(suit) >> value) {
+        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the rest of the line
+        Card card{suit, value};
+        tree.insert(card);
+    }
+}
+/*
 // cards.cpp
 // Author: John Hagedorn
 // Implementation of the CardBST class
@@ -269,3 +339,18 @@ bool CardBST::nodeFinder(int val1, int val2, Node* n) {
         return true;
     }
 }
+
+vector<Card> CardBST::inOrderTraversal() {
+    vector<Card> result;
+    inOrderTraversal(root, result);
+    return result;
+}
+
+void CardBST::inOrderTraversal(Node* n, vector<Card>& result) {
+    if (n != nullptr) {
+        inOrderTraversal(n->left, result);
+        result.push_back(Card{n->suit, n->value});
+        inOrderTraversal(n->right, result);
+    }
+}
+*/

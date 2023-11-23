@@ -1,3 +1,85 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include "cards.h"
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include "cards.h"
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <alice_file> <bob_file>" << std::endl;
+        return 1;
+    }
+
+    // Read cards into binary search trees for Alice and Bob
+    BST aliceTree;
+    BST bobTree;
+
+    std::ifstream aliceFile(argv[1]);
+    std::ifstream bobFile(argv[2]);
+
+    if (!aliceFile || !bobFile) {
+        std::cerr << "Error: Could not open input files." << std::endl;
+        return 1;
+    }
+
+    readCards(aliceFile, aliceTree);
+    readCards(bobFile, bobTree);
+
+    aliceFile.close();
+    bobFile.close();
+
+    // Convert the binary search trees to vectors for efficient traversal
+    std::vector<Card> aliceRemaining = aliceTree.inOrderTraversal();
+    std::vector<Card> bobRemaining = bobTree.inOrderTraversal();
+
+    // Game loop
+    std::vector<std::pair<Card, Card>> matchingPairs;
+
+    while (!aliceRemaining.empty() && !bobRemaining.empty()) {
+        Card aliceCard = aliceRemaining.front();
+        Card bobCard = bobRemaining.front();
+
+        if (aliceCard == bobCard) {
+            // Matching pair found
+            matchingPairs.push_back({aliceCard, bobCard});
+
+            // Remove matching cards from both hands
+            aliceRemaining.erase(aliceRemaining.begin());
+            bobRemaining.erase(bobRemaining.begin());
+        } else if (aliceCard < bobCard) {
+            // Alice's card is smaller, remove from her hand
+            aliceRemaining.erase(aliceRemaining.begin());
+        } else {
+            // Bob's card is smaller, remove from his hand
+            bobRemaining.erase(bobRemaining.begin());
+        }
+    }
+
+    // Print matching pairs
+    for (const auto &pair : matchingPairs) {
+        std::cout << "Alice picked matching card " << pair.first << std::endl;
+        std::cout << "Bob picked matching card " << pair.second << std::endl;
+    }
+
+    // Print remaining cards for both players after the game ends
+    std::cout << "Alice's cards:" << std::endl;
+    for (const auto &c : aliceRemaining) {
+        std::cout << c << std::endl;
+    }
+
+    std::cout << "Bob's cards:" << std::endl;
+    for (const auto &c : bobRemaining) {
+        std::cout << c << std::endl;
+    }
+
+    return 0;
+}
+
+/*
 // main.cpp
 // Author: John Hagedorn
 
@@ -115,9 +197,6 @@ int main(int argc, char** argv) {
     Node* AliceNode = Alice.getMin();
     Node* BobNode = Bob.getMax();
 
-    list<Card> aliceMatches;
-    list<Card> bobMatches;
-
     while (true) {
         bool aliceFound = false;
         bool bobFound = false;
@@ -134,7 +213,6 @@ int main(int argc, char** argv) {
                 int value = AliceNode->value;
                 Alice.removeNode(suit, value);
                 Bob.removeNode(suit, value);
-                aliceMatches.push_back(Card(suit, value));  // Store matching card for Alice
                 cout << "Alice picked matching card " << sToString(suit) << " " << vToString(value) << endl;
                 AliceNode = Alice.successor(suit, value);
                 break;
@@ -153,7 +231,6 @@ int main(int argc, char** argv) {
                 int value = BobNode->value;
                 Alice.removeNode(suit, value);
                 Bob.removeNode(suit, value);
-                bobMatches.push_back(Card(suit, value));  // Store matching card for Bob
                 cout << "Bob picked matching card " << sToString(suit) << " " << vToString(value) << endl;
                 BobNode = Bob.predecessor(suit, value);
                 break;
@@ -170,30 +247,21 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Print matching cards for Alice and Bob
-    for (const auto& card : aliceMatches) {
-        cout << "Alice picked matching card " << sToString(card.suit) << " " << vToString(card.value) << endl;
-    }
-
-    for (const auto& card : bobMatches) {
-        cout << "Bob picked matching card " << sToString(card.suit) << " " << vToString(card.value) << endl;
-    }
-
     // Print remaining cards for Alice without duplicates
     cout << "Alice's cards:" << endl;
     list<Card> aliceRemaining;
-        for (const auto& card : aliceMatches) {
-            bool duplicate = false;
-            for (const auto& existingCard : aliceRemaining) {
-                if (existingCard == card) {
-                    duplicate = true;
-                    break;
-                }
+    for (const auto& card : Alice.inOrderTraversal()) {
+        bool duplicate = false;
+        for (const auto& existingCard : aliceRemaining) {
+            if (existingCard == card) {
+                duplicate = true;
+                break;
             }
-    if (!duplicate) {
-        aliceRemaining.push_back(card);
+        }
+        if (!duplicate) {
+            aliceRemaining.push_back(card);
+        }
     }
-}
     for (const auto& card : aliceRemaining) {
         cout << sToString(card.suit) << " " << vToString(card.value) << endl;
     }
@@ -201,21 +269,22 @@ int main(int argc, char** argv) {
     // Print remaining cards for Bob without duplicates
     cout << "Bob's cards:" << endl;
     list<Card> bobRemaining;
-        for (const auto& card : bobMatches) {
-            bool duplicate = false;
-            for (const auto& existingCard : bobRemaining) {
-                if (existingCard == card) {
-                    duplicate = true;
-                    break;
-                }
-            }
-        if (!duplicate) {
-            bobRemaining.push_back(card);
+    for (const auto& card : Bob.inOrderTraversal()) {
+        bool duplicate = false;
+        for (const auto& existingCard : bobRemaining) {
+            if (existingCard == card) {
+                duplicate = true;
+                break;
             }
         }
+        if (!duplicate) {
+            bobRemaining.push_back(card);
+        }
+    }
     for (const auto& card : bobRemaining) {
         cout << sToString(card.suit) << " " << vToString(card.value) << endl;
     }
 
     return 0;
 }
+*/
