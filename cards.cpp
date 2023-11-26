@@ -128,18 +128,18 @@ void CardBST::clearNode(Node* n) {              // function to clear given node
 void CardBST::printPred(int val1, int val2) {    // cout predecessor function
     Node* pred1 = pred(val1, val2);
     if (pred1) {
-        cout << "Predecessor: " << suitToString(pred1->suit) << " " << valToString(pred1->value) << std::endl;
+        cout << "Predecessor: " << suitToString(pred1->suit) << " " << valToString(pred1->value) << endl;
     } else {
-        cout << "No predecessor found." << std::endl;
+        cout << "No predecessor found." << endl;
     }
 }
 
 void CardBST::printSucc(int val1, int val2) {      // cout successor function
     Node* succ1 = succ(val1, val2);
     if (succ1) {
-        cout << "Successor: " << suitToString(succ1->suit) << " " << valToString(succ1->value) << std::endl;
+        cout << "Successor: " << suitToString(succ1->suit) << " " << valToString(succ1->value) << endl;
     } else {
-        cout << "No successor found." << std::endl;
+        cout << "No successor found." << endl;
     }
 }
 
