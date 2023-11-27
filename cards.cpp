@@ -80,14 +80,14 @@ void CardBST::printInOrder() {  // printInOrder function
     cout << endl;
 }
 
-void CardBST::printInOrder(Node* n) {   // printInOrder helper function
+void CardBST::printInOrder(Node* n, bool isRoot) {
     if (n) {
-        printInOrder(n->left);
-        cout << suitToString(n->suit) << " " << valToString(n->value);
-        if (n->right || n != root) {
+        printInOrder(n->left, false);
+        cout << suitToString(n->suit) << " " << valToString(n->value) << endl;
+        if (n->right || !isRoot) {
             cout << " ";
         }
-        printInOrder(n->right);
+        printInOrder(n->right, false);
     }
 }
 
