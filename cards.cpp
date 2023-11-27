@@ -77,15 +77,20 @@ Node* CardBST::pred(int val1, int val2) {
 
 void CardBST::printInOrder() {  // printInOrder function
     printInOrder(root);
+    cout << endl;
 }
 
 void CardBST::printInOrder(Node* n) {   // printInOrder helper function
     if (n) {
         printInOrder(n->left);
-        cout << suitToString(n->suit) << " " << valToString(n->value) << endl;
+        cout << suitToString(n->suit) << " " << valToString(n->value);
+        if (n->right || n != root) {
+            cout << " ";
+        }
         printInOrder(n->right);
     }
 }
+
 
 string CardBST::suitToString(int suitValue) {   // function converts card suit to string
     switch (suitValue) {
