@@ -35,7 +35,7 @@ int secondSet(string s2) {
     }
 }
 
-void playGame(CardBST& Alice, CardBST& Bob) {
+void startGame(CardBST& Alice, CardBST& Bob) {
     Node* AliceNode = Alice.getMin();
     Node* BobNode = Bob.getMax();
 
@@ -84,6 +84,7 @@ void playGame(CardBST& Alice, CardBST& Bob) {
 
         // If no matching cards were found for both players, end loop
         if (!found) {
+            cout << endl;
             break;
         }
     }
@@ -122,12 +123,12 @@ int main(int argc, char** argv) {
     }
     cardFile2.close();
 
-    playGame(Alice, Bob);
+    startGame(Alice, Bob);
 
     cout << "Alice's cards:" << endl;
     Alice.printInOrder();
 
-    cout << "Bob's cards:" << endl;
+    cout << endl << "Bob's cards:" << endl;
     Bob.printInOrder();
 
     return 0;
