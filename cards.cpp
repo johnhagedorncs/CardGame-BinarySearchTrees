@@ -77,7 +77,6 @@ Node* CardBST::pred(int val1, int val2) {
 
 void CardBST::printInOrder() {  // printInOrder function
     printInOrder(root);
-    cout << endl;
 }
 
 void CardBST::printInOrder(Node* n) {   // printInOrder helper function
