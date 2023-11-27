@@ -80,17 +80,13 @@ void CardBST::printInOrder() {  // printInOrder function
     cout << endl;
 }
 
-void CardBST::printInOrder(Node* n, bool isRoot) {
+void CardBST::printInOrder(Node* n) {   // printInOrder helper function
     if (n) {
-        printInOrder(n->left, false);
+        printInOrder(n->left);
         cout << suitToString(n->suit) << " " << valToString(n->value) << endl;
-        if (n->right || !isRoot) {
-            cout << " ";
-        }
-        printInOrder(n->right, false);
+        printInOrder(n->right);
     }
 }
-
 
 string CardBST::suitToString(int suitValue) {   // function converts card suit to string
     switch (suitValue) {
