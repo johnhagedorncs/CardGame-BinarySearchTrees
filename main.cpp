@@ -54,7 +54,7 @@ void playGame(CardBST& Alice, CardBST& Bob) {
                 int value = AliceNode->value;
                 Alice.removeNode(suit, value);
                 Bob.removeNode(suit, value);
-                cout << "Alice picked matching card " << Alice.suitToString(suit) << " " << Alice.valToString(value) << endl;
+                cout << "Alice picked matching card " << Alice.suitToString(suit) << " " << Alice.valToString(value);
                 AliceNode = Alice.succ(suit, value);
                 break;
             } else {

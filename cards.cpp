@@ -82,7 +82,7 @@ void CardBST::printInOrder() {  // printInOrder function
 void CardBST::printInOrder(Node* n) {   // printInOrder helper function
     if (n) {
         printInOrder(n->left);
-        cout << suitToString(n->suit) << " " << valToString(n->value);
+        cout << suitToString(n->suit) << " " << valToString(n->value) << endl;
         printInOrder(n->right);
     }
 }
